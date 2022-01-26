@@ -1,13 +1,8 @@
 <?php
-class BookDB
+require_once "./model/Model.php";
+class BookDB extends Model
 {
-    public $connection;
-
-    public function __construct($connection)
-    {
-        $this->connection = $connection;
-    }
-
+    
     public function create($book)
     {
         $sql = "call addBook(?,?,?,?,?,?)";

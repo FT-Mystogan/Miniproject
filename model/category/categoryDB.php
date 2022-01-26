@@ -1,11 +1,8 @@
+
 <?php
-class CategoryDB
+require_once "./model/Model.php";
+class CategoryDB extends Model
 {
-    public $connection;
-    public function __construct($connection)
-    {
-        $this->connection = $connection;
-    }
     public function create($category)
     {
         $sql = "INSERT INTO category(name) VALUES (?)";

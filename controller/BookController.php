@@ -3,18 +3,19 @@
 use function Couchbase\defaultDecoder;
 require_once './model/book/book.php';
 require_once './model/book/bookDB.php';
-require_once './model/DBConnection.php';
 require_once './model/category/category.php';
 require_once './model/category/categoryDB.php';
+require_once './inc/helper.php';
 class BookController
 {
 
     public $bookDB;
     public $categorys;
+    public $helper;
     public function __construct()
     {
-        $connection = new DBConnection("mysql:host=localhost;dbname=mysql", "root", "");
-        $this->bookDB = new BookDB($connection->connect());
+        $this->bookDB = new BookDB();
+        $this->helper = new Helper();
     }
     public function add()
     {
@@ -22,10 +23,10 @@ class BookController
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             include 'view/book/add.php';
         } else {
-            $name = $_POST['name'];
-            $author = $_POST['author'];
+            $name = $this->helper->replaceInput($_POST['name']);
+            $author = $this->helper->replaceInput($_POST['author']);
             $categoryid = $_POST['category'];
-            $description = $_POST['description'];
+            $description = $this->helper->replaceInput($_POST['description']);
             $price = $_POST['price'];
             $number = $_POST['number'];
             $book = new Book($name,$author,$categoryid,$description,$price,$number);
@@ -59,7 +60,13 @@ class BookController
             include 'view/book/edit.php';
         } else {
             $id = $_POST['id'];
-            $book = new Book($_POST['name'], $_POST['author'], $_POST['category'],$_POST['description'],$_POST['price'], $_POST['number']);
+            $name = $this->helper->replaceInput($_POST['name']);
+            $author = $this->helper->replaceInput($_POST['author']);
+            $categoryid = $_POST['category'];
+            $description = $this->helper->replaceInput($_POST['description']);
+            $price = $_POST['price'];
+            $number = $_POST['number'];
+            $book = new Book($name,$author, $categoryid,$description,$price,$number);
             $this->bookDB->update($id, $book);
             $this->getList();
         }
