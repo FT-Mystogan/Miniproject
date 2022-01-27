@@ -15,6 +15,23 @@ class UserController
         $this->userDB = new UserDB();
         $this->helper = new Helper();
     }
+    public function isEmail($str)
+    {
+        return (!preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix", $str)) ? FALSE : TRUE;
+    }
+    public function validate()
+    {
+        $message = "";
+        if (!isset($_POST['username'])) {
+            $message = "Bạn chưa nhập vào email";
+        } else if ($this->isEmail($_POST['username'])) {
+            $message = "Trường này phải là email";
+        }
+        if (!isset($_POST['password'])) {
+            $message = "Bạn chưa nhập vào password";
+        }
+        return $message;
+    }
     public function setSession($user)
     {
         $_SESSION['user'] = $user;
@@ -50,29 +67,38 @@ class UserController
     {
         include 'view/user/main.php';
     }
-    public function add($username,$password){
-        $this->userDB->creat($username,$password);
+    public function add($username, $password)
+    {
+        $this->userDB->creat($username, $password);
     }
     public function login()
     {
         include "view/user/login.php";
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = $_POST['username'];
-            $password =$_POST['password'];
-            $user = $this->userDB->check($username, $password);
-            if ($user != null) {
-                $this->setSession($user);
-                if (isset($_POST['saveLogin'])) {
-                    setcookie('id', $user->id, time() + 86400, '/');
-                    setcookie('fullname', $user->fullname, time() + 86400, '/');
-                    setcookie('username', $user->username, time() + 86400, '/');
-                    setcookie('password', $user->password, time() + 86400, '/');
-                    setcookie('img', $user->img, time() + 86400, '/');
-                }
+            $message = $this->validate();
+            if ($message == "") {
+                $username = $_POST['username'];
+                $password = $_POST['password'];
+                $user = $this->userDB->check($username, $password);
+                if ($user != null) {
+                    $this->setSession($user);
+                    if (isset($_POST['saveLogin'])) {
+                        setcookie('id', $user->id, time() + 86400, '/');
+                        setcookie('fullname', $user->fullname, time() + 86400, '/');
+                        setcookie('username', $user->username, time() + 86400, '/');
+                        setcookie('password', $user->password, time() + 86400, '/');
+                        setcookie('img', $user->img, time() + 86400, '/');
+                    }
 
-                header("Location: index.php?page=index");
-                die();
+                    header("Location: index.php?page=index");
+                    die();
+                }
             }
+            else{
+                include "view/user/login.php";
+                unset($message);
+            }
+            
         }
     }
 }

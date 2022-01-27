@@ -1,6 +1,11 @@
 <div class="grid_10">
     <div class="box round first grid">
         <h2>Detail Book</h2>
+        <?php
+        if ($message!="") {
+            echo "<h3>$message</h3>";
+        }
+        ?>
         <div class="block">
             <form action="" method="post" enctype="multipart/form-data">
                 <table class="form">

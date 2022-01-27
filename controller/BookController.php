@@ -1,6 +1,7 @@
 <?php
 
 use function Couchbase\defaultDecoder;
+
 require_once './model/book/book.php';
 require_once './model/book/bookDB.php';
 require_once './model/category/category.php';
@@ -17,21 +18,51 @@ class BookController
         $this->bookDB = new BookDB();
         $this->helper = new Helper();
     }
+    public function validate()
+    {
+        $message = "";
+        if (!isset($_POST['name'])) {
+            $message = "Bạn chưa nhập vào tên sách";
+        }
+        if (!isset($_POST['author'])) {
+            $message = "Bạn chưa nhập vào tên tác giả";
+        }
+        if (!isset($_POST['category'])) {
+            $message = "Bạn chưa nhập vào tên thể loại";
+        }
+        if (!isset($_POST['description'])) {
+            $message = "Bạn chưa nhập vào mô tả";
+        }
+        if (!isset($_POST['price'])) {
+            $message = "Bạn chưa nhập vào giá tiền";
+        } else if (is_numeric($_POST['price'])) {
+            $message = "Giá tiền phải là số";
+        }
+        if (!isset($_POST['number'])) {
+            $message = "Bạn chưa nhập vào tên thể loại";
+        } else if (is_numeric($_POST['number'])) {
+            $message = "Số lượng phải là số";
+        }
+        return $message;
+    }
     public function add()
     {
-        $categorys=$this->categorys;
+        $categorys = $this->categorys;
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             include 'view/book/add.php';
         } else {
-            $name = $this->helper->replaceInput($_POST['name']);
-            $author = $this->helper->replaceInput($_POST['author']);
-            $categoryid = $_POST['category'];
-            $description = $this->helper->replaceInput($_POST['description']);
-            $price = $_POST['price'];
-            $number = $_POST['number'];
-            $book = new Book($name,$author,$categoryid,$description,$price,$number);
-            $this->bookDB->create($book);
-            $message = 'book is created';
+            $message = $this->validate();
+            if ($message == "") {
+                $name = $this->helper->replaceInput($_POST['name']);
+                $author = $this->helper->replaceInput($_POST['author']);
+                $categoryid = $_POST['category'];
+                $description = $this->helper->replaceInput($_POST['description']);
+                $price = $_POST['price'];
+                $number = $_POST['number'];
+                $book = new Book($name, $author, $categoryid, $description, $price, $number);
+                $this->bookDB->create($book);
+                $message = 'book is created';
+            }
             include 'view/book/add.php';
             unset($message);
         }
@@ -53,22 +84,27 @@ class BookController
 
     public function edit()
     {
-        $categorys=$this->categorys;
+        $categorys = $this->categorys;
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $id = $_GET['id'];
             $book = $this->bookDB->get($id);
             include 'view/book/edit.php';
         } else {
-            $id = $_POST['id'];
-            $name = $this->helper->replaceInput($_POST['name']);
-            $author = $this->helper->replaceInput($_POST['author']);
-            $categoryid = $_POST['category'];
-            $description = $this->helper->replaceInput($_POST['description']);
-            $price = $_POST['price'];
-            $number = $_POST['number'];
-            $book = new Book($name,$author, $categoryid,$description,$price,$number);
-            $this->bookDB->update($id, $book);
-            $this->getList();
+            $message = $this->validate();
+            if ($message == "") {
+                $id = $_POST['id'];
+                $name = $this->helper->replaceInput($_POST['name']);
+                $author = $this->helper->replaceInput($_POST['author']);
+                $categoryid = $_POST['category'];
+                $description = $this->helper->replaceInput($_POST['description']);
+                $price = $_POST['price'];
+                $number = $_POST['number'];
+                $book = new Book($name, $author, $categoryid, $description, $price, $number);
+                $this->bookDB->update($id, $book);
+                $this->getList();
+            }
+            else
+                include 'view/book/edit.php';
         }
     }
 }

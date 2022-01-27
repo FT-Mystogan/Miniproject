@@ -20,4 +20,5 @@ class Helper{
         $str = preg_replace("/( )/", '-', $str);
         return $str;
     }
+    
 }

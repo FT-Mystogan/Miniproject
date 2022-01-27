@@ -1,9 +1,8 @@
 <div class="grid_10">
     <div class="box round first grid">
         <h2>Add New Book</h2>
-        <h3></h3>
         <?php
-        if (isset($message)) {
+        if ($message!="") {
             echo "<h3>$message</h3>";
         }
         ?>

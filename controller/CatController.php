@@ -11,6 +11,14 @@ class CatController
         $this->categoryDB = new CategoryDB();
         $this->helper = new Helper();
     }
+    public function validate()
+    {
+        $message = "";
+        if (!isset($_POST['name'])) {
+            $message = "Bạn chưa nhập vào tên thể loại";
+        }
+        return $message;
+    }
     public function add()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -18,12 +26,17 @@ class CatController
         } else {
             $name = $this->helper->replaceInput($_POST['name']);
             $category = new Category($name);
-            $this->categoryDB->create($category);
-            $message = 'category created';
+            $message = $this->validate();
+            if ($message == "") {
+                $this->categoryDB->create($category);
+                $message = 'category created';
+            }
             include 'view/category/add.php';
+            unset($message);
         }
     }
-    public function getCategorys(){
+    public function getCategorys()
+    {
         return $this->categoryDB->getAll();
     }
     public function getList()
@@ -49,9 +62,14 @@ class CatController
             include 'view/category/edit.php';
         } else {
             $id = $_POST['id'];
-            $category = new category($this->helper->replaceInput($_POST['name']));
-            $this->categoryDB->update($id, $category);
-            $this->getList();
+            $message = $this->validate();
+            if ($message == "") {
+                $category = new category($this->helper->replaceInput($_POST['name']));
+                $this->categoryDB->update($id, $category);
+                $message = 'category is edited';
+            }
+            include 'view/category/edit.php';
+            unset($message);
         }
     }
 }

@@ -1,6 +1,11 @@
 <div class="grid_10">
     <div class="box round first grid">
         <h2>Add New Category</h2>
+        <?php
+        if ($message!="") {
+            echo "<h3>$message</h3>";
+        }
+        ?>
         <div class="block copyblock">
             <form action="" method="post" id="form-1">
                 <table class="form">
